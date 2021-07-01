@@ -10,6 +10,11 @@
       "StackName": "amplify-amplifyinstagram-dev-100457",
       "StackId": "arn:aws:cloudformation:us-east-1:055346554872:stack/amplify-amplifyinstagram-dev-100457/55658f00-da75-11eb-8555-1291290b94c1",
       "AmplifyAppId": "d36scdiaz5cdyn"
+    },
+    "categories": {
+      "auth": {
+        "amplifyinstagram11d77d05": {}
+      }
     }
   }
 }

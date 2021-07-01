@@ -1,1 +1,10 @@
-{}
+{
+  "auth": {
+    "amplifyinstagram11d77d05": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}
