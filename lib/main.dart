@@ -47,11 +47,25 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: _amplifyConfigured
           ? AppRoot()
-          : Material(
-              child: Center(
+          : Scaffold(
+              body: Center(
                 child: CircularProgressIndicator(),
               ),
             ),
+      theme: ThemeData(
+        bottomNavigationBarTheme:
+            BottomNavigationBarThemeData(selectedItemColor: Colors.grey[900]),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white,
+          centerTitle: false,
+          textTheme: TextTheme(
+            headline6: TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

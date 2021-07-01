@@ -1,32 +1,47 @@
 import 'package:amplify_flutter/amplify.dart';
-import 'features/profile/user_profile.dart';
+// import 'features/profile/user_profile.dart';
 import 'package:flutter/material.dart';
 
 import 'features/auth/sign_in.dart';
+import 'features/navigation_views.dart';
+import 'utils/navigation_view.dart';
 
-class AppRoot extends StatelessWidget {
+class AppRoot extends StatefulWidget {
+  @override
+  _AppRootState createState() => _AppRootState();
+}
+
+class _AppRootState extends State<AppRoot> {
+  @override
+  void initState() {
+    _initView();
+    super.initState();
+  }
+
+  Future<void> _initView() async {
+    try {
+      await Amplify.Auth.getCurrentUser(); //.then((value) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => AuthenticatedRoot(),
+        ),
+      );
+      // });
+    } catch (e) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => SignInView(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Amplify.Auth.getCurrentUser().then((value) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => AuthenticatedRoot(),
-          ),
-        );
-      }).catchError((error) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => SignInView(),
-          ),
-        );
-      }),
-      builder: (context, snapshot) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
+    return Scaffold(
+        body: Center(
+      child: CircularProgressIndicator(),
+    ));
   }
 }
 
@@ -37,20 +52,6 @@ class AuthenticatedRoot extends StatefulWidget {
 
   @override
   _AuthenticatedRootState createState() => _AuthenticatedRootState();
-}
-
-class NavigationBarView {
-  Widget appBarTitle;
-  Widget body;
-  BottomNavigationBarItem bottomNavigationBarItem;
-  FloatingActionButton? floatingActionButton;
-
-  NavigationBarView({
-    required this.appBarTitle,
-    required this.body,
-    required this.bottomNavigationBarItem,
-    this.floatingActionButton,
-  });
 }
 
 class _AuthenticatedRootState extends State<AuthenticatedRoot> {
@@ -64,63 +65,60 @@ class _AuthenticatedRootState extends State<AuthenticatedRoot> {
 
   @override
   Widget build(BuildContext context) {
-    List<NavigationBarView> _navigationBarViews = <NavigationBarView>[
-      NavigationBarView(
-        appBarTitle: Text('Home'),
-        body: Scaffold(body: Center(child: Text('Home'))),
-        bottomNavigationBarItem: BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
+    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: WillPopScope(
+            onWillPop: () async => !await navigationViews[_selectedIndex]
+                .navigatorKey
+                .currentState!
+                .maybePop(),
+            child: Stack(
+              children: navigationViews
+                  .map(
+                    (view) => Offstage(
+                      offstage: navigationViews[_selectedIndex] != view,
+                      child: view.builder(
+                        navigatorKey: view.navigatorKey,
+                        scaffoldKey: view.scaffoldKey,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ),
-      ),
-      NavigationBarView(
-        appBarTitle: Text('Search'),
-        body: Scaffold(body: Center(child: Text('Search'))),
-        bottomNavigationBarItem: BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: 'Search',
-        ),
-      ),
-      NavigationBarView(
-        appBarTitle: Text('Reels'),
-        body: Scaffold(body: Center(child: Text('Reels'))),
-        bottomNavigationBarItem: BottomNavigationBarItem(
-          icon: Icon(Icons.video_collection),
-          label: 'Reels',
-        ),
-      ),
-      NavigationBarView(
-        appBarTitle: Text('Shopping'),
-        body: Scaffold(body: Center(child: Text('Shopping'))),
-        bottomNavigationBarItem: BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_bag_outlined),
-          label: 'Shopping',
-        ),
-      ),
-      NavigationBarView(
-        appBarTitle: Text('Profile'),
-        body: UserProfile(),
-        bottomNavigationBarItem: BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ),
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Amplify Instagram'),
-      ),
-      body: _navigationBarViews.elementAt(_selectedIndex).body,
-      bottomNavigationBar: BottomNavigationBar(
-        items: _navigationBarViews
-            .map((view) => view.bottomNavigationBarItem)
-            .toList(),
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
-      floatingActionButton:
-          _navigationBarViews.elementAt(_selectedIndex).floatingActionButton,
+        isKeyboardOpen
+            ? Container(height: 0)
+            : Stack(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).dividerColor,
+                          blurRadius: 0.0,
+                        ),
+                      ],
+                    ),
+                    child: BottomNavigationBar(
+                      currentIndex: _selectedIndex,
+                      onTap: (index) => _onItemTapped(index),
+                      type: BottomNavigationBarType.fixed,
+                      items: navigationViews.map<BottomNavigationBarItem>(
+                        (NavigationView navigationView) {
+                          return BottomNavigationBarItem(
+                            icon: navigationView.icon,
+                            label: navigationView.title,
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ),
+                ],
+              ),
+      ],
     );
   }
 }
