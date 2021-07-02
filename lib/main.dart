@@ -1,9 +1,12 @@
+import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_api/amplify_api.dart';
 import 'amplifyconfiguration.dart';
 
 import 'app_root.dart';
+import 'models/ModelProvider.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,6 +30,12 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     Amplify.addPlugin(AmplifyAuthCognito());
+
+    AmplifyDataStore datastorePlugin = AmplifyDataStore(
+      modelProvider: ModelProvider.instance,
+    );
+    Amplify.addPlugin(datastorePlugin);
+    Amplify.addPlugin(AmplifyAPI());
 
     try {
       await Amplify.configure(amplifyconfig);
@@ -57,6 +66,7 @@ class _MyAppState extends State<MyApp> {
             BottomNavigationBarThemeData(selectedItemColor: Colors.grey[900]),
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
           centerTitle: false,
           textTheme: TextTheme(
             headline6: TextStyle(

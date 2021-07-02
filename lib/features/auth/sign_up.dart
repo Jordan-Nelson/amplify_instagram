@@ -15,12 +15,16 @@ class SignUpView extends StatefulWidget {
 
 class _SignUpViewState extends State<SignUpView> {
   String username = '';
+  String name = '';
   String email = '';
   String password = '';
-  void signUp(String username, String email, String password) async {
+  void signUp(
+      String username, String name, String email, String password) async {
     try {
       Map<String, String> userAttributes = {
         'email': email,
+        'name': name,
+        'preferred_username': username,
       };
 
       SignUpResult res = await Amplify.Auth.signUp(
@@ -89,6 +93,15 @@ class _SignUpViewState extends State<SignUpView> {
                 },
               ),
               TextFormField(
+                initialValue: this.name,
+                decoration: InputDecoration(labelText: 'Name'),
+                onChanged: (value) {
+                  setState(() {
+                    this.name = value;
+                  });
+                },
+              ),
+              TextFormField(
                 decoration: InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (value) {
@@ -133,6 +146,7 @@ class _SignUpViewState extends State<SignUpView> {
                     onPressed: () {
                       signUp(
                         this.username,
+                        this.name,
                         this.email,
                         this.password,
                       );
