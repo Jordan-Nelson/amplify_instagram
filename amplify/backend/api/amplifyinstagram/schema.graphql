@@ -1,6 +1,11 @@
 type User
   @model
-  @auth(rules: [{ allow: owner, operations: [create, update, delete] }]) {
+  @auth(
+    rules: [
+      { allow: owner, operations: [create, update, delete] }
+      { allow: private, provider: iam }
+    ]
+  ) {
   id: ID!
   name: String!
   username: String!
