@@ -1,4 +1,5 @@
 import 'package:amplify_datastore/amplify_datastore.dart';
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
@@ -28,14 +29,18 @@ class _MyAppState extends State<MyApp> {
 
   void _configureAmplify() async {
     if (!mounted) return;
-
-    Amplify.addPlugin(AmplifyAuthCognito());
-
+    AmplifyAuthCognito authPlugin = AmplifyAuthCognito();
+    AmplifyStorageS3 storagePlugin = AmplifyStorageS3();
     AmplifyDataStore datastorePlugin = AmplifyDataStore(
       modelProvider: ModelProvider.instance,
     );
-    Amplify.addPlugin(datastorePlugin);
-    Amplify.addPlugin(AmplifyAPI());
+    AmplifyAPI apiPlugin = AmplifyAPI();
+    await Amplify.addPlugins([
+      authPlugin,
+      storagePlugin,
+      datastorePlugin,
+      apiPlugin,
+    ]);
 
     try {
       await Amplify.configure(amplifyconfig);

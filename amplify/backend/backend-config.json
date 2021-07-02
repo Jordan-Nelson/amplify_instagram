@@ -44,5 +44,11 @@
         }
       ]
     }
+  },
+  "storage": {
+    "amplifyinstagramstorage": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation"
+    }
   }
 }
