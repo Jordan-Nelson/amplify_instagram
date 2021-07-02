@@ -140,6 +140,11 @@ class Post extends Model {
           ModelOperation.CREATE,
           ModelOperation.UPDATE,
           ModelOperation.DELETE
+        ]),
+      AuthRule(
+        authStrategy: AuthStrategy.PRIVATE,
+        operations: [
+          ModelOperation.READ
         ])
     ];
     

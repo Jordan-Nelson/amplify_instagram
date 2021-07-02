@@ -144,7 +144,15 @@ class User extends Model {
       AuthRule(
         authStrategy: AuthStrategy.PRIVATE,
         operations: [
-          ModelOperation.CREATE
+          ModelOperation.READ
+        ]),
+      AuthRule(
+        authStrategy: AuthStrategy.PRIVATE,
+        operations: [
+          ModelOperation.CREATE,
+          ModelOperation.UPDATE,
+          ModelOperation.DELETE,
+          ModelOperation.READ
         ])
     ];
     
