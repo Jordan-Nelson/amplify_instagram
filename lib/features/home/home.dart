@@ -64,6 +64,16 @@ class _HomeState extends State<Home> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(posts![index].title),
+                    subtitle: FutureBuilder<User>(
+                        future: getUser(posts![index].user!.id),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text('@' + snapshot.data!.username);
+                          } else if (snapshot.hasError) {
+                            return Text('failed to find post author');
+                          }
+                          return Text('loading ...');
+                        }),
                   );
                 },
               ),

@@ -40,6 +40,7 @@ class _SearchState extends State<Search> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(users![index].name),
+                    subtitle: Text('@' + users![index].username),
                   );
                 },
               ),
