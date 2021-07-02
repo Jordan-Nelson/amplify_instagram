@@ -15,6 +15,8 @@
 
 // ignore_for_file: public_member_api_docs
 
+import 'package:amplify_instagram/custom_models/ImageObject.dart';
+
 import 'ModelProvider.dart';
 import 'package:amplify_datastore_plugin_interface/amplify_datastore_plugin_interface.dart';
 import 'package:collection/collection.dart';
@@ -26,7 +28,7 @@ class Post extends Model {
   static const classType = const _PostModelType();
   final String id;
   final String? _caption;
-  final List<String>? _images;
+  final List<ImageObject>? _images;
   final User? _user;
   final List<Comment>? _comments;
 
@@ -51,7 +53,7 @@ class Post extends Model {
     }
   }
 
-  List<String> get images {
+  List<ImageObject> get images {
     try {
       return _images!;
     } catch (e) {
@@ -82,13 +84,14 @@ class Post extends Model {
   factory Post(
       {String? id,
       required String caption,
-      required List<String> images,
+      required List<ImageObject> images,
       User? user,
       List<Comment>? comments}) {
     return Post._internal(
         id: id == null ? UUID.getUUID() : id,
         caption: caption,
-        images: images != null ? List<String>.unmodifiable(images) : images,
+        images:
+            images != null ? List<ImageObject>.unmodifiable(images) : images,
         user: user,
         comments:
             comments != null ? List<Comment>.unmodifiable(comments) : comments);
@@ -130,7 +133,7 @@ class Post extends Model {
   Post copyWith(
       {String? id,
       String? caption,
-      List<String>? images,
+      List<ImageObject>? images,
       User? user,
       List<Comment>? comments}) {
     return Post(
@@ -144,7 +147,11 @@ class Post extends Model {
   Post.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         _caption = json['caption'],
-        _images = json['images']?.cast<String>(),
+        _images = json['images'] != null
+            ? (json['images'] as List<Object?>)
+                .map((e) => ImageObject.fromJsonString(e.toString()))
+                .toList()
+            : null,
         _user = json['user']?['serializedData'] != null
             ? User.fromJson(
                 new Map<String, dynamic>.from(json['user']['serializedData']))
@@ -160,7 +167,7 @@ class Post extends Model {
   Map<String, dynamic> toJson() => {
         'id': id,
         'caption': _caption,
-        'images': _images,
+        'images': _images?.map((e) => e.toJsonString()).toList(),
         'user': _user?.toJson(),
         'comments': _comments?.map((e) => e?.toJson())?.toList()
       };

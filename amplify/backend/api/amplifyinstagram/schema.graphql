@@ -24,7 +24,7 @@ type Post
   ) {
   id: ID!
   caption: String!
-  images: [ImageObject]!
+  images: [AWSJSON]!
   userID: ID!
   user: User @connection(fields: ["userID"])
   comments: [Comment] @connection(keyName: "byPost", fields: ["id"])
@@ -44,9 +44,4 @@ type Comment
   post: Post @connection(fields: ["postID"])
   user: User @connection
   content: String!
-}
-
-type ImageObject {
-  key: String!
-  url: String!
 }
