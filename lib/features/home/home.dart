@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify.dart';
 import 'package:amplify_instagram/models/ModelProvider.dart';
+import 'package:amplify_instagram/utils/user_utils.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -101,8 +102,9 @@ class _CreatPostState extends State<CreatPost> {
                 ),
                 SizedBox(height: 8),
                 ElevatedButton(
-                  onPressed: () {
-                    Post post = Post(title: this.title);
+                  onPressed: () async {
+                    User user = await getCurrentUser();
+                    Post post = Post(title: this.title, user: user);
                     Amplify.DataStore.save(post).then((value) {
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
