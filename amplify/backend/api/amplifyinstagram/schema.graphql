@@ -24,7 +24,7 @@ type Post
   ) {
   id: ID!
   caption: String!
-  images: [AWSJSON]!
+  images: [ImageObject]!
   userID: ID!
   user: User @connection(fields: ["userID"])
   comments: [Comment] @connection(keyName: "byPost", fields: ["id"])
@@ -46,16 +46,7 @@ type Comment
   content: String!
 }
 
-# type ImageObject {
-#   key: String!
-#   url: String!
-# }
-
-# @model
-# @key(name: "byPost", fields: ["postID", "key", "url"])
-# @auth(
-#   rules: [
-#     { allow: owner, operations: [create, update, delete] }
-#     { allow: private, operations: [read] }
-#   ]
-# )
+type ImageObject {
+  key: String!
+  url: String!
+}
