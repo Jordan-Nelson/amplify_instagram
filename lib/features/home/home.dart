@@ -33,6 +33,14 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             onPressed: () {
+              Amplify.DataStore.clear();
+            },
+            icon: Icon(
+              Icons.delete,
+            ),
+          ),
+          IconButton(
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
