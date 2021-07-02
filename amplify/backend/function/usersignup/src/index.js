@@ -18,11 +18,12 @@ exports.handler = async (event, context) => {
     console.log('API_AMPLIFYINSTAGRAM_GRAPHQLAPIENDPOINTOUTPUT', process.env.API_AMPLIFYINSTAGRAM_GRAPHQLAPIENDPOINTOUTPUT)
     console.log('name', event.request.userAttributes.name)
     console.log('preferred_username', event.request.userAttributes.preferred_username)
-
+    console.log('event.request', JSON.stringify(event.request))
     const req = new AWS.HttpRequest(appsyncUrl, region);
 
     const item = {
         input: {
+            id: event.request.userAttributes.sub,
             name: event.request.userAttributes.name,
             username: event.request.userAttributes.preferred_username
         }
