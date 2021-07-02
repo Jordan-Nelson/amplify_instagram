@@ -3,6 +3,8 @@ import 'package:amplify_instagram/models/ModelProvider.dart';
 import 'package:amplify_instagram/utils/user_utils.dart';
 import 'package:flutter/material.dart';
 
+import 'create_post.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -16,7 +18,7 @@ class _HomeState extends State<Home> {
   Future fetchPosts() async {
     List<Post> _posts = await Amplify.DataStore.query(Post.classType);
     setState(() {
-      posts = _posts;
+      posts = _posts.reversed.toList();
     });
   }
 
@@ -62,19 +64,14 @@ class _HomeState extends State<Home> {
               child: ListView.builder(
                 itemCount: posts!.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(posts![index].title),
-                    subtitle: FutureBuilder<User>(
-                        future: getUser(posts![index].user!.id),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Text('@' + snapshot.data!.username);
-                          } else if (snapshot.hasError) {
-                            return Text('failed to find post author');
-                          }
-                          return Text('loading ...');
-                        }),
-                  );
+                  return Card(
+                      child: Column(
+                    children: [
+                      UserListTile(post: posts![index]),
+                      PostImagesView(post: posts![index]),
+                      ListTile(title: Text(posts![index].caption))
+                    ],
+                  ));
                 },
               ),
             ),
@@ -82,68 +79,59 @@ class _HomeState extends State<Home> {
   }
 }
 
-class CreatPost extends StatefulWidget {
-  const CreatPost({Key? key}) : super(key: key);
+class UserListTile extends StatelessWidget {
+  const UserListTile({
+    Key? key,
+    required this.post,
+  }) : super(key: key);
 
-  @override
-  _CreatPostState createState() => _CreatPostState();
-}
+  final Post post;
 
-class _CreatPostState extends State<CreatPost> {
-  String title = '';
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Create Post'),
-        ),
-        body: Form(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: [
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Title'),
-                  onChanged: (value) {
-                    setState(() {
-                      this.title = value;
-                    });
-                  },
-                ),
-                SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () async {
-                    User user = await getCurrentUser();
-                    Post post = Post(title: this.title, user: user);
-                    Amplify.DataStore.save(post).then((value) {
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.green[700],
-                          content: Text(
-                            'Post created!',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      );
-                    }).catchError((e) {
-                      print(e.message);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.red[900],
-                          content: Text(
-                            'Error: ' + e.message,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      );
-                    });
-                  },
-                  child: Text('Create'),
-                )
-              ],
-            ),
-          ),
-        ));
+    Widget trailing = IconButton(
+        onPressed: () {
+          Amplify.DataStore.delete(post);
+        },
+        icon: Icon(Icons.delete));
+    return FutureBuilder<User>(
+      future: getUser(post.user!.id),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return ListTile(
+            title: Text(snapshot.data!.name),
+            subtitle: Text('@' + snapshot.data!.username),
+            trailing: trailing,
+          );
+        } else if (snapshot.hasError) {
+          return ListTile(title: Text('failed to find post author'));
+        }
+        return ListTile(title: Text('loading...'));
+      },
+    );
+  }
+}
+
+class PostImagesView extends StatelessWidget {
+  const PostImagesView({
+    Key? key,
+    required this.post,
+  }) : super(key: key);
+
+  final Post post;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 325,
+      child: PageView(
+        scrollDirection: Axis.horizontal,
+        children: post.images
+            // .map((e) => ImageObject.fromJsonString(e))
+            .map((imageObject) =>
+                Image.network(imageObject.url, fit: BoxFit.cover))
+            .toList(),
+      ),
+    );
   }
 }
