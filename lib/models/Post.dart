@@ -26,7 +26,8 @@ import 'package:flutter/foundation.dart';
 class Post extends Model {
   static const classType = const _PostModelType();
   final String id;
-  final String? _title;
+  final String? _caption;
+  final List<ImageObject>? _images;
   final User? _user;
   final List<Comment>? _comments;
 
@@ -38,9 +39,17 @@ class Post extends Model {
     return id;
   }
   
-  String get title {
+  String get caption {
     try {
-      return _title!;
+      return _caption!;
+    } catch(e) {
+      throw new DataStoreException(DataStoreExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage, recoverySuggestion: DataStoreExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion, underlyingException: e.toString());
+    }
+  }
+  
+  List<ImageObject> get images {
+    try {
+      return _images!;
     } catch(e) {
       throw new DataStoreException(DataStoreExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage, recoverySuggestion: DataStoreExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion, underlyingException: e.toString());
     }
@@ -54,12 +63,13 @@ class Post extends Model {
     return _comments;
   }
   
-  const Post._internal({required this.id, required title, user, comments}): _title = title, _user = user, _comments = comments;
+  const Post._internal({required this.id, required caption, required images, user, comments}): _caption = caption, _images = images, _user = user, _comments = comments;
   
-  factory Post({String? id, required String title, User? user, List<Comment>? comments}) {
+  factory Post({String? id, required String caption, required List<ImageObject> images, User? user, List<Comment>? comments}) {
     return Post._internal(
       id: id == null ? UUID.getUUID() : id,
-      title: title,
+      caption: caption,
+      images: images != null ? List<ImageObject>.unmodifiable(images) : images,
       user: user,
       comments: comments != null ? List<Comment>.unmodifiable(comments) : comments);
   }
@@ -73,7 +83,8 @@ class Post extends Model {
     if (identical(other, this)) return true;
     return other is Post &&
       id == other.id &&
-      _title == other._title &&
+      _caption == other._caption &&
+      DeepCollectionEquality().equals(_images, other._images) &&
       _user == other._user &&
       DeepCollectionEquality().equals(_comments, other._comments);
   }
@@ -87,24 +98,31 @@ class Post extends Model {
     
     buffer.write("Post {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("title=" + "$_title" + ", ");
+    buffer.write("caption=" + "$_caption" + ", ");
     buffer.write("user=" + (_user != null ? _user!.toString() : "null"));
     buffer.write("}");
     
     return buffer.toString();
   }
   
-  Post copyWith({String? id, String? title, User? user, List<Comment>? comments}) {
+  Post copyWith({String? id, String? caption, List<ImageObject>? images, User? user, List<Comment>? comments}) {
     return Post(
       id: id ?? this.id,
-      title: title ?? this.title,
+      caption: caption ?? this.caption,
+      images: images ?? this.images,
       user: user ?? this.user,
       comments: comments ?? this.comments);
   }
   
   Post.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _title = json['title'],
+      _caption = json['caption'],
+      _images = json['images'] is List
+        ? (json['images'] as List)
+          .where((e) => e?['serializedData'] != null)
+          .map((e) => ImageObject.fromJson(new Map<String, dynamic>.from(e['serializedData'])))
+          .toList()
+        : null,
       _user = json['user']?['serializedData'] != null
         ? User.fromJson(new Map<String, dynamic>.from(json['user']['serializedData']))
         : null,
@@ -116,11 +134,14 @@ class Post extends Model {
         : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'title': _title, 'user': _user?.toJson(), 'comments': _comments?.map((e) => e?.toJson())?.toList()
+    'id': id, 'caption': _caption, 'images': _images?.map((e) => e?.toJson())?.toList(), 'user': _user?.toJson(), 'comments': _comments?.map((e) => e?.toJson())?.toList()
   };
 
   static final QueryField ID = QueryField(fieldName: "post.id");
-  static final QueryField TITLE = QueryField(fieldName: "title");
+  static final QueryField CAPTION = QueryField(fieldName: "caption");
+  static final QueryField IMAGES = QueryField(
+    fieldName: "images",
+    fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: (ImageObject).toString()));
   static final QueryField USER = QueryField(
     fieldName: "user",
     fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: (User).toString()));
@@ -151,9 +172,16 @@ class Post extends Model {
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: Post.TITLE,
+      key: Post.CAPTION,
       isRequired: true,
       ofType: ModelFieldType(ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.hasMany(
+      key: Post.IMAGES,
+      isRequired: false,
+      ofModelName: (ImageObject).toString(),
+      associatedKey: ImageObject.POSTIMAGESID
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
