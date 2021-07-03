@@ -13,12 +13,17 @@ class Profile extends StatelessWidget {
           // todo
         } else if (snapshot.hasData) {
           return Scaffold(
-            appBar: AppBar(title: Text('@' + snapshot.data!.username)),
+            appBar: AppBar(
+              title: Text('@' + snapshot.data!.username),
+              actions: [
+                ClearDataStoreIconButton(),
+              ],
+            ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
               child: ListView(
                 children: [
-                  ElevatedButton(
+                  OutlinedButton(
                     onPressed: () {
                       Amplify.Auth.signOut().then((value) {
                         Navigator.of(context, rootNavigator: true)
@@ -40,6 +45,58 @@ class Profile extends StatelessWidget {
           child: CircularProgressIndicator(),
         );
       },
+    );
+  }
+}
+
+class ClearDataStoreIconButton extends StatelessWidget {
+  const ClearDataStoreIconButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        child: Text('Clear local data'),
+                        style: ButtonStyle(
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.red),
+                        ),
+                        onPressed: () {
+                          Amplify.DataStore.clear();
+                          Navigator.of(context).maybePop();
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        child: Text('Cancel'),
+                        style: ButtonStyle(),
+                        onPressed: () {
+                          Navigator.of(context).maybePop();
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            });
+      },
+      icon: Icon(Icons.menu),
     );
   }
 }

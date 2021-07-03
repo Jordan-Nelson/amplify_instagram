@@ -1,4 +1,5 @@
 import 'package:amplify_datastore/amplify_datastore.dart';
+import 'package:amplify_instagram/utils/themes.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify.dart';
@@ -66,21 +67,7 @@ class _MyAppState extends State<MyApp> {
                 child: CircularProgressIndicator(),
               ),
             ),
-      theme: ThemeData(
-        bottomNavigationBarTheme:
-            BottomNavigationBarThemeData(selectedItemColor: Colors.grey[900]),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white,
-          iconTheme: IconThemeData(color: Colors.black),
-          centerTitle: false,
-          textTheme: TextTheme(
-            headline6: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-            ),
-          ),
-        ),
-      ),
+      theme: getAppTheme(),
     );
   }
 }

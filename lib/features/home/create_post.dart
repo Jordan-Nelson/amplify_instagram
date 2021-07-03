@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify.dart';
-import 'package:amplify_instagram/custom_models/ImageObject.dart';
 import 'package:amplify_instagram/models/ModelProvider.dart';
 import 'package:amplify_instagram/utils/storage_utils.dart';
 import 'package:amplify_instagram/utils/user_utils.dart';
 import 'package:flutter/material.dart';
 
 class CreatPost extends StatefulWidget {
-  const CreatPost({Key? key}) : super(key: key);
+  const CreatPost({Key? key, required this.imageFiles}) : super(key: key);
+  final List<File> imageFiles;
 
   @override
   _CreatPostState createState() => _CreatPostState();
@@ -17,12 +17,11 @@ class CreatPost extends StatefulWidget {
 
 class _CreatPostState extends State<CreatPost> {
   String caption = '';
-  List<File> imageFiles = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Create Post'),
+          title: Text('New Post'),
         ),
         body: Form(
           child: Padding(
@@ -30,17 +29,22 @@ class _CreatPostState extends State<CreatPost> {
             child: ListView(
               children: [
                 SizedBox(
-                  height: 100,
-                  child: Center(
-                    child: IconButton(
-                      icon: Icon(Icons.add_a_photo),
-                      onPressed: () async {
-                        List<File> _imageFiles = await pickImages();
-                        setState(() {
-                          imageFiles = _imageFiles;
-                        });
-                      },
-                    ),
+                  height: 250,
+                  child: Stack(
+                    children: [
+                      Image.file(widget.imageFiles[0]),
+                      if (widget.imageFiles.length > 1)
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Icon(
+                              Icons.view_array,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 TextFormField(
@@ -52,24 +56,24 @@ class _CreatPostState extends State<CreatPost> {
                   },
                 ),
                 SizedBox(height: 8),
-                ElevatedButton(
+                OutlinedButton(
                   onPressed: () async {
                     try {
                       String postId = UUID.getUUID();
                       User user = await getCurrentUser();
-                      List<ImageObject> images = [];
-                      for (var imageFile in imageFiles) {
-                        ImageObject imageObject = await uploadImage(
+                      List<String> imageKeys = [];
+                      for (var imageFile in widget.imageFiles) {
+                        String imageKey = await uploadImage(
                           file: imageFile,
                           postId: postId,
                         );
-                        images.add(imageObject);
+                        imageKeys.add(imageKey);
                       }
                       Post post = Post(
                         id: postId,
                         caption: this.caption,
                         user: user,
-                        images: images,
+                        imageKeys: imageKeys,
                       );
                       await Amplify.DataStore.save(post);
 
