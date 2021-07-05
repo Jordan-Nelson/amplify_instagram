@@ -8,7 +8,8 @@ final ImagePicker _picker = ImagePicker();
 StorageAccessLevel postAccessLevel = StorageAccessLevel.protected;
 
 Future<List<File>> pickImages() async {
-  final pickedFileList = await _picker.getMultiImage();
+  // TODO: resize images in a lamda
+  final pickedFileList = await _picker.getMultiImage(maxWidth: 375);
   if (pickedFileList != null && pickedFileList.isNotEmpty) {
     return pickedFileList.map((pickedFile) => File(pickedFile.path)).toList();
   }
@@ -34,7 +35,16 @@ Future<String> uploadImage({
   return key;
 }
 
+Map<String, String> _imageKeyCache = {};
+
+String? getImageUrlFromCache(String imageKey) {
+  return _imageKeyCache[imageKey];
+}
+
 Future<String> getImageUrl(String imageKey) {
+  if (_imageKeyCache[imageKey] != null) {
+    return Future.value(_imageKeyCache[imageKey]);
+  }
   return Amplify.Storage.getUrl(
     key: imageKey,
     options: GetUrlOptions(
@@ -42,6 +52,8 @@ Future<String> getImageUrl(String imageKey) {
       expires: 604800,
     ),
   ).then((value) {
+    print(value.url);
+    _imageKeyCache[imageKey] = value.url;
     return value.url;
   }).catchError((error) {
     print('error');

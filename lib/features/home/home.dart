@@ -34,7 +34,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text('Instagram'),
         actions: [
-          CreatePostIconButton(),
+          CreatePostIconButton(onCreatePost: fetchPosts),
         ],
       ),
       body: posts == null

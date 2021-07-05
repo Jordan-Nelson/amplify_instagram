@@ -84,40 +84,43 @@ class UserListTile extends StatelessWidget {
     Widget trailing = IconButton(
       onPressed: () {
         showModalBottomSheet(
+            useRootNavigator: true,
             context: context,
             builder: (context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        child: Text('Delete'),
-                        style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red),
+              return SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          child: Text('Delete'),
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.red),
+                          ),
+                          onPressed: () {
+                            Amplify.DataStore.delete(post);
+                            Navigator.of(context).maybePop();
+                          },
                         ),
-                        onPressed: () {
-                          Amplify.DataStore.delete(post);
-                          Navigator.of(context).maybePop();
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        child: Text('Cancel'),
-                        style: ButtonStyle(),
-                        onPressed: () {
-                          Navigator.of(context).maybePop();
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          child: Text('Cancel'),
+                          style: ButtonStyle(),
+                          onPressed: () {
+                            Navigator.of(context).maybePop();
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               );
             });
       },
@@ -177,7 +180,10 @@ class _PostImagesViewState extends State<PostImagesView> {
             controller: _controler,
             scrollDirection: Axis.horizontal,
             children: widget.post.imageKeys
-                .map((imageKey) => AmplifyStorageImage(storageKey: imageKey))
+                .map((imageKey) => AmplifyStorageImage(
+                      key: Key('AmplifyStorageImage' + imageKey),
+                      storageKey: imageKey,
+                    ))
                 .toList(),
           ),
         ),

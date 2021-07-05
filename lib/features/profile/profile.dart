@@ -10,7 +10,9 @@ class Profile extends StatelessWidget {
       future: Amplify.Auth.getCurrentUser(),
       builder: (BuildContext context, AsyncSnapshot<AuthUser> snapshot) {
         if (snapshot.hasError) {
-          // todo
+          return Center(
+            child: Text('An error occured loading the users profile data'),
+          );
         } else if (snapshot.hasData) {
           return Scaffold(
             appBar: AppBar(
@@ -59,40 +61,43 @@ class ClearDataStoreIconButton extends StatelessWidget {
     return IconButton(
       onPressed: () {
         showModalBottomSheet(
+            useRootNavigator: true,
             context: context,
             builder: (context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        child: Text('Clear local data'),
-                        style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red),
+              return SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          child: Text('Clear local data'),
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.red),
+                          ),
+                          onPressed: () {
+                            Amplify.DataStore.clear();
+                            Navigator.of(context).maybePop();
+                          },
                         ),
-                        onPressed: () {
-                          Amplify.DataStore.clear();
-                          Navigator.of(context).maybePop();
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        child: Text('Cancel'),
-                        style: ButtonStyle(),
-                        onPressed: () {
-                          Navigator.of(context).maybePop();
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          child: Text('Cancel'),
+                          style: ButtonStyle(),
+                          onPressed: () {
+                            Navigator.of(context).maybePop();
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               );
             });
       },

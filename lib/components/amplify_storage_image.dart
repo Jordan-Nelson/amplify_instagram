@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'circular_progress_bar.dart';
 
-// A widget that displays and image given a storage key
+// A widget that displays and image given an S3 storage key
 class AmplifyStorageImage extends StatelessWidget {
   const AmplifyStorageImage({
     Key? key,
@@ -15,44 +15,62 @@ class AmplifyStorageImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? imageUrl = getImageUrlFromCache(storageKey);
+    if (imageUrl != null) {
+      return CahedImage(imageUrl: imageUrl);
+    }
     return FutureBuilder<String>(
       future: getImageUrl(storageKey),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return CachedNetworkImage(
-            cacheKey: storageKey, // uses the S3 storage key to cache the image
-            fadeInDuration: Duration(milliseconds: 200),
-            fadeOutDuration: Duration.zero,
-            placeholderFadeInDuration: Duration.zero,
-            imageUrl: snapshot.data!,
-            fit: BoxFit.cover,
-            progressIndicatorBuilder: (context, url, downloadProgress) {
-              return Container(
-                color: Colors.grey[200],
-                child: Center(
-                  child: CircleProgressBar(
-                    foregroundColor: Colors.grey[700]!,
-                    value: downloadProgress.progress ?? 0,
-                  ),
-                ),
-              );
-            },
-            errorWidget: (context, url, error) =>
-                Center(child: Icon(Icons.cloud_off, size: 36)),
-          );
+          return CahedImage(imageUrl: snapshot.data!);
         } else if (snapshot.hasError) {
           return Center(child: Icon(Icons.cloud_off, size: 36));
         } else {
           return Container(
             color: Colors.grey[200],
             child: Center(
-                child: CircleProgressBar(
-              foregroundColor: Colors.grey[700]!,
-              value: 0,
-            )),
+              child: CircleProgressBar(
+                foregroundColor: Colors.grey[700]!,
+                value: 0,
+              ),
+            ),
           );
         }
       },
+    );
+  }
+}
+
+class CahedImage extends StatelessWidget {
+  const CahedImage({Key? key, required this.imageUrl}) : super(key: key);
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return CachedNetworkImage(
+      fadeInDuration: Duration(milliseconds: 0),
+      fadeOutDuration: Duration.zero,
+      placeholderFadeInDuration: Duration.zero,
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      progressIndicatorBuilder: (context, url, downloadProgress) {
+        return Container(
+          color: Colors.grey[200],
+          child: Center(
+            child: CircleProgressBar(
+              foregroundColor: Colors.grey[700]!,
+              value: downloadProgress.progress ?? 0,
+            ),
+          ),
+        );
+      },
+      errorWidget: (context, url, error) => Center(
+        child: Icon(
+          Icons.cloud_off,
+          size: 36,
+        ),
+      ),
     );
   }
 }
