@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:amplify_instagram/models/ModelProvider.dart';
+import 'package:amplify_instagram/utils/snackbar_utils.dart';
 import 'package:amplify_instagram/utils/storage_utils.dart';
 import 'package:amplify_instagram/utils/user_utils.dart';
 import 'package:flutter/material.dart';
@@ -91,25 +92,12 @@ class _CreatPostState extends State<CreatPost> {
                               widget.onCreatePost!();
                             }
                             Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.green[700],
-                                content: Text(
-                                  'Post created!',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            );
+                            showSuccessSnackBar(context, 'Post created!');
                           } catch (e) {
                             print(e);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.red[900],
-                                content: Text(
-                                  'There was an issue creating the post',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
+                            showErrorSnackBar(
+                              context,
+                              'There was an issue creating the post',
                             );
                           }
                           setState(() {
