@@ -19,6 +19,8 @@ exports.handler = async (event, context) => {
     console.log('name', event.request.userAttributes.name)
     console.log('preferred_username', event.request.userAttributes.preferred_username)
     console.log('event.request', JSON.stringify(event.request))
+    console.log('context', JSON.stringify(context))
+    console.log('event', JSON.stringify(event))
     const req = new AWS.HttpRequest(appsyncUrl, region);
 
     const item = {

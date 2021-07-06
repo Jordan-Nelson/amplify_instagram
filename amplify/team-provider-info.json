@@ -18,7 +18,7 @@
       "function": {
         "usersignup": {
           "deploymentBucketName": "amplify-amplifyinstagram-dev-100457-deployment",
-          "s3Key": "amplify-builds/usersignup-476b3272655465324172-build.zip"
+          "s3Key": "amplify-builds/usersignup-3648366e6e756e324744-build.zip"
         }
       }
     }
