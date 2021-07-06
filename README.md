@@ -1,16 +1,25 @@
 # amplify_instagram
 
-A new Flutter project.
+This is an instagram clone built with AWS amplify and Flutter.
 
-## Getting Started
+_Note:_ The main purpose of the project is to demonstrate how to build a social media app with amplify, not imitating the exact UI and UX of Instagram.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Auth / User Profile
+  - [x] Basic Auth flow
+  - [x] Add user entities to Dynamo via post sing up lambda trigger
+  - [ ] Social authentication (facebook, etc.)
+  - [ ] Editable profile (bio, etc)
+  - [ ] Editable profile picture
+  - [ ] Followers
+- New Feed
+  - [x] Create posts w/ images
+  - [ ] Create posts w/ video
+  - [x] Basic news feed layout
+  - [x] Comment on posts w/ live updates (streaming)
+  - [x] View all comments (pagination)
+  - [x] News feed w/ only posts from those that you follow
+  - [ ] Stories
+- Search
+  - [ ] Search for users
