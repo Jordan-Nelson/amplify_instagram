@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify.dart';
+import 'package:amplify_instagram/app_models/image_object.dart';
 import 'package:amplify_instagram/models/ModelProvider.dart';
 import 'package:amplify_instagram/utils/snackbar_utils.dart';
 import 'package:amplify_instagram/utils/storage_utils.dart';
@@ -73,19 +74,21 @@ class _CreatPostState extends State<CreatPost> {
                           try {
                             String postId = UUID.getUUID();
                             User user = await getCurrentUser();
-                            List<String> imageKeys = [];
+                            List<String> imageObjectStrings = [];
                             for (var imageFile in widget.imageFiles) {
-                              String imageKey = await uploadImage(
+                              ImageObject imageObject = await uploadImage(
                                 file: imageFile,
                                 postId: postId,
+                                userId: user.id,
                               );
-                              imageKeys.add(imageKey);
+                              imageObjectStrings
+                                  .add(imageObject.toJsonString());
                             }
                             Post post = Post(
                               id: postId,
                               caption: this.caption,
                               user: user,
-                              imageKeys: imageKeys,
+                              imageObjects: imageObjectStrings,
                             );
                             await Amplify.DataStore.save(post);
                             if (widget.onCreatePost != null) {

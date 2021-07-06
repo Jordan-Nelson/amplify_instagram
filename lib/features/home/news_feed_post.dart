@@ -1,4 +1,5 @@
 import 'package:amplify_flutter/amplify.dart';
+import 'package:amplify_instagram/app_models/image_object.dart';
 import 'package:amplify_instagram/components/amplify_storage_image.dart';
 import 'package:amplify_instagram/components/user_avatar.dart';
 import 'package:amplify_instagram/models/ModelProvider.dart';
@@ -346,10 +347,11 @@ class _PostImagesViewState extends State<PostImagesView> {
           child: PageView(
             controller: _controler,
             scrollDirection: Axis.horizontal,
-            children: widget.post.imageKeys
-                .map((imageKey) => AmplifyStorageImage(
-                      key: Key('AmplifyStorageImage' + imageKey),
-                      storageKey: imageKey,
+            children: widget.post.imageObjects
+                .map((imageObjectString) =>
+                    ImageObject.fromJsonString(imageObjectString))
+                .map((imageObject) => AmplifyStorageImage(
+                      imageObject: imageObject,
                     ))
                 .toList(),
           ),
@@ -378,9 +380,9 @@ class _PostImagesViewState extends State<PostImagesView> {
                 ),
               ],
             ),
-            if (widget.post.imageKeys.length > 1)
+            if (widget.post.imageObjects.length > 1)
               DotsIndicator(
-                dotsCount: widget.post.imageKeys.length,
+                dotsCount: widget.post.imageObjects.length,
                 position: position,
               ),
             ButtonBar(

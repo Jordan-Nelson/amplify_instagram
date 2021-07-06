@@ -13,6 +13,8 @@ class ImageObject {
     return this == other;
   }
 
+  String get cacheKey => this.identityId + '/' + this.key;
+
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;

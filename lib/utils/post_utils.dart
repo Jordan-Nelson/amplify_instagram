@@ -20,6 +20,7 @@ Stream<List<Comment>> streamTopComments(Post post) async* {
   yield comments;
   await for (var event in events) {
     if (event.eventType == EventType.create &&
+        event.item.post!.id == post.id &&
         !comments.map((item) => item.id).contains(event.item.id)) {
       User user = (await Amplify.DataStore.query(User.classType,
               where: User.ID.eq(event.item.user!.id)))

@@ -1,3 +1,4 @@
+import 'package:amplify_instagram/app_models/image_object.dart';
 import 'package:amplify_instagram/utils/storage_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -8,19 +9,19 @@ import 'circular_progress_bar.dart';
 class AmplifyStorageImage extends StatelessWidget {
   const AmplifyStorageImage({
     Key? key,
-    required this.storageKey,
+    required this.imageObject,
   }) : super(key: key);
 
-  final String storageKey;
+  final ImageObject imageObject;
 
   @override
   Widget build(BuildContext context) {
-    String? imageUrl = getImageUrlFromCache(storageKey);
+    String? imageUrl = getImageUrlFromCache(imageObject);
     if (imageUrl != null) {
       return CahedImage(imageUrl: imageUrl);
     }
     return FutureBuilder<String>(
-      future: getImageUrl(storageKey),
+      future: getImageUrl(imageObject),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return CahedImage(imageUrl: snapshot.data!);
